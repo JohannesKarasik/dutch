@@ -400,23 +400,22 @@ def keep_only_comma_changes(original: str, candidate: str) -> str:
 
 def insert_commas_with_openai(text: str) -> str:
     """
-    Inserts/removes commas ONLY.
-    Must not change words/letters/case. Only commas + whitespace around commas.
+    Voegt ALLEEN komma’s toe of verwijdert ze.
+    Mag geen woorden/letters/hoofdletters wijzigen. Alleen komma’s + spaties rond komma’s.
     """
     try:
         system_prompt = (
-            "Olet suomen kielen pilkkukorjaaja.\n\n"
-            "SÄÄNNÖT (PAKOLLINEN):\n"
-            "- Korjaa VAIN pilkut\n"
-            "- ÄLÄ muuta oikeinkirjoitusta, kirjaimia tai sanoja\n"
-            "- ÄLÄ lisää tai poista sanoja\n"
-            "- ÄLÄ muuta sanojen järjestystä\n"
-            "- Saat lisätä tai poistaa VAIN pilkkuja\n"
-            "- Saat muuttaa välilyöntejä vain pilkun vieressä\n"
-            "- ET SAA yhdistää tai erottaa sanoja\n\n"
-            "Palauta VAIN teksti."
+            "Je bent een Nederlandse kommachecker.\n\n"
+            "REGELS (VERPLICHT):\n"
+            "- Corrigeer ALLEEN komma’s\n"
+            "- Verander GEEN spelling, letters of woorden\n"
+            "- Voeg GEEN woorden toe en verwijder GEEN woorden\n"
+            "- Verander de woordvolgorde NIET\n"
+            "- Je mag ALLEEN komma’s toevoegen of verwijderen\n"
+            "- Je mag spaties alleen aanpassen direct naast een komma\n"
+            "- Je mag woorden NIET samenvoegen of splitsen\n\n"
+            "Geef ALLEEN de tekst terug."
         )
-
 
         client = get_openai_client()
         resp = client.chat.completions.create(
@@ -432,14 +431,14 @@ def insert_commas_with_openai(text: str) -> str:
         if not out:
             return text
 
-        # Hard validate: words must be EXACTLY identical
-        # Keep only comma + whitespace changes
+        # Hard validate: woorden moeten EXACT identiek blijven
+        # Sta alleen komma- en spatieveranderingen rond komma’s toe
         safe = keep_only_comma_changes(text, out)
-        safe = undo_space_merges(text, safe)  # extra safety
+        safe = undo_space_merges(text, safe)  # extra veiligheid
         return safe
 
     except Exception as e:
-        print("❌ OpenAI comma-only error:", e)
+        print("❌ OpenAI comma-only Dutch error:", e)
         return text
 
 
@@ -448,42 +447,42 @@ def insert_commas_with_openai(text: str) -> str:
 def correct_with_openai(text: str) -> str:
     """
     Hard constraints:
-    - älä lisää / poista / järjestä uudelleen sanoja
-    - salli oikeinkirjoitus, välimerkit ja välilyönnit
+    - voeg geen woorden toe / verwijder geen woorden / verander de woordvolgorde niet
+    - sta alleen spelling, interpunctie en spaties toe
     """
     try:
         base_prompt = (
-            "Olet ammattimainen suomen kielen oikolukija.\n\n"
-            "TAVOITE: Korjaa KAIKKI kirjoitusvirheet ja KAIKKI välimerkit, "
-            "erityisesti pilkut, muuttamatta sisällön merkitystä.\n\n"
+            "Je bent een professionele Nederlandse proeflezer.\n\n"
+            "DOEL: Corrigeer ALLE spelfouten en ALLE interpunctie, "
+            "vooral komma’s, zonder de betekenis van de inhoud te veranderen.\n\n"
 
-            "EHDOTTOMAT SÄÄNNÖT (PAKOLLINEN):\n"
-            "- ÄLÄ lisää uusia sanoja\n"
-            "- ÄLÄ poista sanoja\n"
-            "- ÄLÄ muuta sanojen järjestystä\n"
-            "- ÄLÄ muotoile lauseita uudelleen\n"
-            "- ÄLÄ käytä synonyymejä\n"
-            "- Saat muuttaa vain kirjaimia olemassa olevien sanojen SISÄLLÄ "
-            "oikeinkirjoituksen korjaamiseksi\n"
-            "- Saat korjata vain välimerkkejä (pilkku, piste, kaksoispiste, lainausmerkit) "
-            "ja välilyöntejä\n"
-            "- Säilytä rivinvaihdot ja kappaleet TÄSMÄLLEEN kuten syötteessä\n\n"
+            "ABSOLUTE REGELS (VERPLICHT):\n"
+            "- Voeg GEEN nieuwe woorden toe\n"
+            "- Verwijder GEEN woorden\n"
+            "- Verander de woordvolgorde NIET\n"
+            "- Herschrijf zinnen NIET\n"
+            "- Gebruik GEEN synoniemen\n"
+            "- Je mag alleen letters BINNEN bestaande woorden aanpassen "
+            "om spelling te corrigeren\n"
+            "- Je mag alleen interpunctie corrigeren (komma, punt, dubbele punt, aanhalingstekens) "
+            "en spaties\n"
+            "- Behoud regeleinden en alinea’s PRECIES zoals in de invoer\n\n"
 
-            "PILKKUTARKISTUS (TEE ENNEN VASTAUSTA):\n"
-            "1) Pilkku alistuskonjunktion jälkeen:\n"
-            "   jos / kun / vaikka / koska / jotta / ennen kuin / sen jälkeen kun / "
-            "niin että / vaikka ... ,\n"
-            "2) Pilkut sivulauseiden ympärille\n"
-            "3) Pilkku ennen 'ja / mutta / tai' vain jos ne yhdistävät "
-            "kaksi itsenäistä lausetta\n"
-            "4) Pilkut luetteloissa selkeyden vuoksi\n"
-            "5) ÄLÄ laita pilkkua subjektin ja predikaatin väliin\n\n"
+            "KOMMACONTROLE (DOE DIT VOORDAT JE ANTWOORDT):\n"
+            "1) Komma na een bijzin of inleidende bijzinsconstructie waar nodig:\n"
+            "   als / wanneer / hoewel / omdat / zodat / voordat / nadat / "
+            "zodat / ook al ... ,\n"
+            "2) Komma’s rond bijzinnen waar grammaticaal nodig\n"
+            "3) Komma vóór 'en / maar / of' alleen als ze "
+            "twee zelfstandige hoofdzinnen verbinden\n"
+            "4) Komma’s in opsommingen voor duidelijkheid\n"
+            "5) Zet GEEN komma tussen onderwerp en persoonsvorm\n\n"
 
-            "TÄRKEÄÄ:\n"
-            "Tekstissä on virheitä. Sinun täytyy löytää ja korjata ne.\n"
-            "ÄLÄ palauta identtistä tekstiä, jos pilkku- tai kirjoitusvirheitä on.\n\n"
+            "BELANGRIJK:\n"
+            "De tekst bevat fouten. Je moet ze vinden en corrigeren.\n"
+            "Geef GEEN identieke tekst terug als er komma- of spelfouten zijn.\n\n"
 
-            "Palauta VAIN korjattu teksti. Ei selityksiä."
+            "Geef ALLEEN de gecorrigeerde tekst terug. Geen uitleg."
         )
 
         def call_llm(system_prompt: str, user_text: str) -> str:
@@ -508,9 +507,9 @@ def correct_with_openai(text: str) -> str:
         # 2) Retry if unchanged
         if corrected.strip() == text.strip():
             nudge_prompt = base_prompt + (
-                "\n\nTEKSTISSÄ ON VIRHEITÄ.\n"
-                "Korjaa KAIKKI selvät kirjoitus- ja pilkkuvirheet sääntöjen mukaisesti.\n"
-                "Käy lauseet läpi yksitellen."
+                "\n\nDE TEKST BEVAT FOUTEN.\n"
+                "Corrigeer ALLE duidelijke spelling- en kommfouten volgens de regels.\n"
+                "Loop de zinnen één voor één na."
             )
             corrected2 = call_llm(nudge_prompt, text)
             if corrected2:
@@ -519,10 +518,10 @@ def correct_with_openai(text: str) -> str:
         # 3) Strict validation
         if violates_no_word_add_remove(text, corrected):
             strict_prompt = base_prompt + (
-                "\n\nERITTÄIN TIIUKKA TILA:\n"
-                "- Sanojen lukumäärän täytyy olla TÄSMÄLLEEN sama\n"
-                "- Jokaisen sanan on oltava sama sana (vain pienet kirjoituskorjaukset sallitaan)\n"
-                "- Älä paranna tyyliä tai sujuvuutta\n"
+                "\n\nZEER STRENGE MODUS:\n"
+                "- Het aantal woorden moet PRECIES gelijk blijven\n"
+                "- Elk woord moet hetzelfde woord blijven (alleen kleine spellingscorrecties zijn toegestaan)\n"
+                "- Verbeter stijl of vloeiendheid niet\n"
             )
             corrected2 = call_llm(strict_prompt, text)
             if corrected2:
@@ -541,7 +540,7 @@ def correct_with_openai(text: str) -> str:
         return corrected
 
     except Exception as e:
-        print("❌ OpenAI Finnish error:", e)
+        print("❌ OpenAI Dutch error:", e)
         return text
 
 
