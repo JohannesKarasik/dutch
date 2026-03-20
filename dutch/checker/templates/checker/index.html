@@ -1119,12 +1119,27 @@
     if (!diff) return; // safety
 
     tooltip.innerHTML = `
-      <div class="suggestion">${escapeHTML(diff.suggestion || "")}</div>
-      <div class="actions">
-        <button type="button" class="apply">Käytä</button>
-        <button type="button" class="dismiss">Hylkää</button>
+  <div class="tc-tip">
+    <div class="tc-tip__head">
+      <div class="tc-tip__title">Suggestie</div>
+      <span class="tc-badge tc-badge--improve">Verbetering</span>
+    </div>
+
+    <div class="tc-tip__row">
+      <div>
+        <div class="tc-tip__meta">Aanbevolen</div>
+        <div class="tc-tip__text tc-tip__text--good">
+          ${escapeHTML(diff.suggestion || "")}
+        </div>
       </div>
-    `;
+    </div>
+
+    <div class="tc-tip__actions">
+      <button type="button" class="tc-btn tc-btn--primary apply">Toepassen</button>
+      <button type="button" class="tc-btn dismiss">Negeren</button>
+    </div>
+  </div>
+`;
 
     positionTooltip(err);
   });
