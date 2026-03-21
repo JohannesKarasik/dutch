@@ -11,6 +11,7 @@ urlpatterns = [
     path("stripe/webhook/", stripe_webhook, name="stripe_webhook"),
     path("cancel-subscription/", views.cancel_subscription, name="cancel_subscription"),
     path("settings/", views.settings_view, name="settings"),
+    path("stripe/webhook/", stripe_webhook, name="stripe_webhook")
 
 
 ]

@@ -1383,7 +1383,7 @@
         const csrfToken = document.querySelector("input[name=csrfmiddlewaretoken]")?.value;
 
         if (!csrfToken) {
-          alert("Sikkerhetstoken mangler. Last siden på nytt.");
+          alert("Beveiligingstoken ontbreekt. Vernieuw de pagina.");
           return;
         }
 
@@ -1391,25 +1391,35 @@
           method: "POST",
           headers: {
             "X-CSRFToken": csrfToken,
+            "X-Requested-With": "XMLHttpRequest",
             "Content-Type": "application/json",
           },
           credentials: "same-origin",
         });
 
-        if (!res.ok) {
-          throw new Error("Checkout request failed");
+        const contentType = res.headers.get("content-type") || "";
+        let data = null;
+
+        if (contentType.includes("application/json")) {
+          data = await res.json();
+        } else {
+          const text = await res.text();
+          console.error("Non-JSON response:", text);
+          throw new Error("Server returned non-JSON response");
         }
 
-        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data?.error || "Checkout request failed");
+        }
 
         if (!data.url) {
-          throw new Error("Stripe URL mangler");
+          throw new Error("Stripe checkout URL ontbreekt");
         }
 
         window.location.href = data.url;
       } catch (err) {
         console.error("Stripe checkout error:", err);
-        alert("Noe gikk galt. Prøv igjen om et øyeblikk.");
+        alert("Er ging iets mis. Probeer het opnieuw over een ogenblik.");
       }
     });
   })();
