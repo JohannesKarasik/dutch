@@ -908,6 +908,9 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 def create_checkout_session(request):
     profile, _ = Profile.objects.get_or_create(user=request.user)
 
+    print("STRIPE_MODE:", settings.STRIPE_MODE)
+    print("STRIPE_PRICE_ID:", settings.STRIPE_PRICE_ID)
+
     # ✅ ALWAYS create or reuse Stripe customer
     if profile.stripe_customer_id:
         customer_id = profile.stripe_customer_id
