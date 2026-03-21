@@ -5,26 +5,26 @@
     <a href="/" class="logo" style="display:flex; align-items:center; gap:10px; text-decoration:none;">
       <img
         src="{% static 'checker/logo.png' %}"
-        alt="Oikoluku"
+        alt="Tekst nakijken"
         style="height:70px; width:auto; display:block; max-height:none;"
       >
     </a>
 
     <div class="header-actions">
       {% if user.is_authenticated %}
-      <a href="{% url 'settings' %}" class="header-link">Asetukset</a>
+      <a href="{% url 'settings' %}" class="header-link">Instellingen</a>
 
 
         <form method="post" action="{% url 'logout' %}" style="margin:0;">
           {% csrf_token %}
-          <button type="submit" class="header-link header-link--button">Kirjaudu ulos</button>
+          <button type="submit" class="header-link header-link--button">Uitloggen</button>
         </form>
       {% else %}
         <button type="button" class="header-link header-link--button" onclick="window.openAuthModal?.()">
-          Kirjaudu sisään
+          Inloggen
         </button>
         <button type="button" class="header-link header-link--button" onclick="window.openRegisterModal?.()">
-          Luo tili
+          Account aanmaken
         </button>
       {% endif %}
     </div>
