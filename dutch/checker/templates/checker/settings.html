@@ -1,13 +1,13 @@
 {% load static %}
 
 <!DOCTYPE html>
-<html lang="fi">
+<html lang="nl">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <title>Asetukset – Rettskriving Sjekk</title>
-  <meta name="description" content="Hallitse tiliäsi, tilaustasi ja salasanaasi Rettskriving Sjekk -palvelussa." />
+  <title>Instellingen – Rettskriving Sjekk</title>
+  <meta name="description" content="Beheer je account, abonnement en wachtwoord in Rettskriving Sjekk." />
 
   <link rel="icon" href="{% static 'checker/favicon_io/favicon.ico' %}">
   <link rel="stylesheet" href="{% static 'checker/main.css' %}">
@@ -23,9 +23,9 @@
 
         <div class="settings">
 
-          <h1>Asetukset</h1>
+          <h1>Instellingen</h1>
           <p class="settings-subtitle">
-            Hallitse tiliäsi ja tilaustasi
+            Beheer je account en abonnement
           </p>
 
           {% if messages %}
@@ -36,43 +36,43 @@
             {% endfor %}
           {% endif %}
 
-          <!-- Konto -->
+          <!-- Account -->
           <section class="settings-section">
-            <h3>Tili</h3>
+            <h3>Account</h3>
             <div class="settings-row">
-              <span>Sähköposti</span>
+              <span>E-mail</span>
               <strong>{{ email }}</strong>
             </div>
           </section>
 
           <!-- Abonnement -->
           <section class="settings-section">
-            <h3>Tilaus</h3>
+            <h3>Abonnement</h3>
 
             {% if is_paying %}
-              <p class="status status--ok">Aktiivinen tilaus</p>
+              <p class="status status--ok">Actief abonnement</p>
 
               <form method="post" action="{% url 'cancel_subscription' %}">
                 {% csrf_token %}
                 <button
                   type="submit"
                   class="btn btn--danger btn--outline"
-                  onclick="return confirm('Haluatko varmasti peruuttaa tilauksesi?')"
+                  onclick="return confirm('Weet je zeker dat je je abonnement wilt opzeggen?')"
                 >
-                  Peruuta tilaus
+                  Abonnement opzeggen
                 </button>
               </form>
             {% else %}
-              <p class="status status--warn">Ei aktiivista tilausta</p>
+              <p class="status status--warn">Geen actief abonnement</p>
             {% endif %}
           </section>
 
-          <!-- Logg ut -->
+          <!-- Uitloggen -->
           <section class="settings-section">
             <form method="post" action="{% url 'logout' %}">
               {% csrf_token %}
               <button type="submit" class="btn btn--outline">
-                Kirjaudu ulos
+                Uitloggen
               </button>
             </form>
           </section>
